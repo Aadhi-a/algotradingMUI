@@ -115,7 +115,7 @@ export const Spacings = {
 };
 
 export const Gradients = {
-  primary: [primary[300], Colors.CloudDrift],
+  primary: [primary[600], Colors.CloudDrift],
   primaryDark: ["#364f47", "#141f1c"],
   primaryDiagonal: ["#527a6c", "#93b5a7", "#ffffff"],
   secondary: [primary[400], primary[600]],
@@ -143,5 +143,11 @@ export const Shadows = {
     shadowOpacity: 0.3,
     shadowRadius: WP(2),
     elevation: 6,
+  },
+
+  textShadow: {
+    textShadowColor: "#000",
+    textShadowOffset: { width: 1, height: 0.5 },
+    textShadowRadius: 0.5,
   },
 };
