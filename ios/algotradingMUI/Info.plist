@@ -6,6 +6,12 @@
 	<true/>
 	<key>CFBundleDevelopmentRegion</key>
 	<string>en</string>
+
+<!-- 🔥 IMPORTANT FOR react-native-config -->
+	<key>Config</key>
+	<string>$(CONFIGURATION)</string>
+	<!-- 🔥 -->
+
 	<key>CFBundleDisplayName</key>
 	<string>algotradingMUI</string>
 	<key>CFBundleExecutable</key>
@@ -29,7 +35,7 @@
 	<key>NSAppTransportSecurity</key>
 	<dict>
 		<key>NSAllowsArbitraryLoads</key>
-		<false/>
+		<true/>
 		<key>NSAllowsLocalNetworking</key>
 		<true/>
 	</dict>
