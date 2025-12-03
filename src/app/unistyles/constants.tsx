@@ -68,13 +68,13 @@ export const Colors = {
 
 // Fonts
 export const Fonts = {
-  Charm_Bold: "Charm-Bold",
-  CharmRegular: "Charm-Regular",
-  HiMelodyRegular: "HiMelody-Regular",
-  NotoSans: "NotoSansSyriac",
-  RobotoItalic: "Roboto-Italic",
-  Roboto: "Roboto",
-  RobotoSlab: "RobotoSlab",
+  Mono_Medium: "DMMono-Medium",
+  Mono_Regular: "DMMono-Regular",
+  Inter_Bold: "Inter_24pt-Bold",
+  Inter_ExtraBold: "Inter_24pt-ExtraBold",
+  Inter_Medium: "Inter_24pt-Medium",
+  Inter_Regular: "Inter_24pt-Regular",
+  Inter_SemiBold: "Inter_24pt-SemiBold",
 };
 
 // Font Sizes (responsive)
