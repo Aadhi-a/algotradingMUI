@@ -1,4 +1,5 @@
 // Typography.tsx
+
 import { Fonts, FontSizes } from "@unistyles/constants";
 import React, { FC } from "react";
 import { Text, TextStyle } from "react-native";
@@ -8,6 +9,7 @@ type Variant = "h1" | "h2" | "h3" | "h4" | "h5" | "h6" | "h7";
 interface TypographyProps {
   variant?: Variant;
   fontFamily?: keyof typeof Fonts;
+  fontWeight?: TextStyle["fontWeight"];
   fontSize?: number;
   color?: string;
   style?: TextStyle | TextStyle[];
@@ -34,6 +36,7 @@ const StyledText: FC<TypographyProps> = ({
   color,
   children,
   numberOfLines,
+  fontWeight,
   onLayout,
   ...props
 }) => {
@@ -43,8 +46,12 @@ const StyledText: FC<TypographyProps> = ({
     <Text
       numberOfLines={numberOfLines}
       style={[
-        { fontSize: computedFontSize, color },
-        { fontFamily: Fonts[fontFamily] },
+        {
+          fontSize: computedFontSize,
+          color,
+          fontFamily: Fonts[fontFamily],
+          ...(fontWeight && { fontWeight }), // 👉 Apply only if passed
+        },
         style,
       ]}
       onLayout={onLayout}

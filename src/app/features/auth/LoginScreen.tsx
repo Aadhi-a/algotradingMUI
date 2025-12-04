@@ -19,28 +19,35 @@ import Icon from "@components/global/Icon";
 import StyledText from "@components/global/StylesText";
 import { loginUser } from "@features/toolkit/slice/authSlice";
 import { AppDispatch, RootState } from "@features/toolkit/store/store";
+import Button from "@components/global/Button";
+import { setStorage } from "@utils/mmkvStrorage";
+import Toast from "react-native-toast-message";
+import { navigate } from "@utils/NavigationUtills";
 
 const LoginScreen: FC = () => {
   const { styles } = useStyles(loginStyle);
   const dispatch = useDispatch<AppDispatch>();
   const { loading, error } = useSelector((state: RootState) => state.auth);
 
-  const [form, setForm] = useState({ email: "", password: "" });
+  const [form, setForm] = useState({ phonenumber: "", password: "" });
   const [secure, setSecure] = useState(true);
 
-  // Keyboard animation
+  // -------------------------------------------
+  // 🔹 Keyboard Animation
+  // -------------------------------------------
   const keyboard = useAnimatedKeyboard();
   const animatedKeyboardStyle = useAnimatedStyle(() => {
     const translate = interpolate(
       keyboard.height.value,
-      [0, 100, 450],
+      [0, 200, 450],
       [0, -20, -65]
     );
+
     return {
       transform: [
         {
           translateY: withTiming(translate, {
-            duration: 280,
+            duration: 250,
             easing: Easing.out(Easing.cubic),
           }),
         },
@@ -48,21 +55,15 @@ const LoginScreen: FC = () => {
     };
   });
 
-  // 🔹 One-by-one component animations
-  const titleOpacity = useSharedValue(0);
-  const emailOpacity = useSharedValue(0);
-  const passwordOpacity = useSharedValue(0);
-  const buttonOpacity = useSharedValue(0);
-
-  // 🔹 Background gradient fade
-  const bgOpacity = useSharedValue(0);
-
-  const animatedStyle = (opacity: Animated.SharedValue<number>) =>
+  // -------------------------------------------
+  // 🔹 Fade + Slide Animation Function
+  // -------------------------------------------
+  const fadeSlide = (sv: Animated.SharedValue<number>) =>
     useAnimatedStyle(() => ({
-      opacity: opacity.value,
+      opacity: sv.value,
       transform: [
         {
-          translateY: withTiming(opacity.value === 1 ? 0 : 20, {
+          translateY: withTiming(sv.value === 1 ? 0 : 20, {
             duration: 500,
             easing: Easing.out(Easing.cubic),
           }),
@@ -70,57 +71,86 @@ const LoginScreen: FC = () => {
       ],
     }));
 
-  const animatedBgStyle = useAnimatedStyle(() => ({
+  // -------------------------------------------
+  // 🔹 Shared Animation Values
+  // -------------------------------------------
+  const bgOpacity = useSharedValue(0);
+  const titleOpacity = useSharedValue(0);
+  const phoneOpacity = useSharedValue(0);
+  const passOpacity = useSharedValue(0);
+  const forgetOpacity = useSharedValue(0);
+  const btnOpacity = useSharedValue(0);
+  const signOpacity = useSharedValue(0);
+
+  const bgStyle = useAnimatedStyle(() => ({
     opacity: withTiming(bgOpacity.value, {
-      duration: 900,
+      duration: 800,
       easing: Easing.out(Easing.cubic),
     }),
   }));
 
+  // -------------------------------------------
+  // 🔹 One-by-One Animation Trigger
+  // -------------------------------------------
   useEffect(() => {
-    // Fade in background
     bgOpacity.value = 1;
 
-    // Staggered animation for components
-    titleOpacity.value = withTiming(1, { duration: 400 });
-    setTimeout(
-      () => (emailOpacity.value = withTiming(1, { duration: 400 })),
-      200
-    );
-    setTimeout(
-      () => (passwordOpacity.value = withTiming(1, { duration: 400 })),
-      400
-    );
-    setTimeout(
-      () => (buttonOpacity.value = withTiming(1, { duration: 400 })),
-      600
-    );
+    setTimeout(() => (titleOpacity.value = withTiming(1)), 100);
+    setTimeout(() => (phoneOpacity.value = withTiming(1)), 250);
+    setTimeout(() => (passOpacity.value = withTiming(1)), 400);
+    setTimeout(() => (forgetOpacity.value = withTiming(1)), 550);
+    setTimeout(() => (btnOpacity.value = withTiming(1)), 700);
+    setTimeout(() => (signOpacity.value = withTiming(1)), 850);
   }, []);
 
+  // -------------------------------------------
+  // 🔹 Form Handlers
+  // -------------------------------------------
   const updateForm = (key: keyof typeof form, value: string) => {
     setForm((prev) => ({ ...prev, [key]: value }));
   };
 
   const handleLogin = async () => {
-    if (!form.email || !form.password) {
-      Alert.alert("Error", "Please enter mobile number and password");
+    if (!form.phonenumber || !form.password) {
+      Toast.show({
+        type: "errorToast",
+        text1: "Please enter mobile number and password",
+        position: "bottom",
+      });
       return;
     }
 
     try {
-      const result = await dispatch(
-        loginUser({ phonenumber: form.email, password: form.password })
+      await new Promise((resolve: any) => setTimeout(resolve, 1000));
+
+      const user = await dispatch(
+        loginUser({
+          phonenumber: form.phonenumber,
+          password: form.password,
+        })
       ).unwrap();
-      console.log("Login success:", result);
-      Alert.alert("Success", "Logged in successfully!");
+
+      setStorage("User", JSON.stringify(user));
+
+      Toast.show({
+        type: "successToast",
+        text1: "Logged in successfully!",
+        position: "top",
+      });
     } catch (err: any) {
-      console.log("Login failed:", err);
       Alert.alert("Error", err || "Login failed");
     }
   };
 
+  const handleSignUP = async () => {
+    navigate("Signup");
+  };
+
+  // -------------------------------------------
+  // 🔹 UI Render
+  // -------------------------------------------
   return (
-    <Animated.View style={[{ flex: 1 }, animatedBgStyle]}>
+    <Animated.View style={[{ flex: 1 }, bgStyle]}>
       <LinearGradient
         colors={Gradients.primary}
         start={{ x: 0, y: 0 }}
@@ -132,7 +162,7 @@ const LoginScreen: FC = () => {
         >
           <View style={styles.container}>
             {/* Title */}
-            <Animated.View style={animatedStyle(titleOpacity)}>
+            <Animated.View style={fadeSlide(titleOpacity)}>
               <View style={styles.txtContent}>
                 <StyledText
                   variant="h3"
@@ -142,6 +172,7 @@ const LoginScreen: FC = () => {
                 >
                   Let’s Trade Smarter!!
                 </StyledText>
+
                 <StyledText
                   variant="h5"
                   fontFamily="Inter_ExtraBold"
@@ -153,70 +184,95 @@ const LoginScreen: FC = () => {
               </View>
             </Animated.View>
 
-            {/* Email Input */}
-            <Animated.View style={animatedStyle(emailOpacity)}>
+            {/* Inputs */}
+            <Animated.View style={[styles.inputCont, fadeSlide(phoneOpacity)]}>
+              {/* Mobile Number */}
               <Input
                 label="Mobile Number"
                 placeholder="Enter your mobile number"
                 leftIcon={
-                  <Icon name="mailFilled" size={20} color={Colors.primary} />
+                  <Icon name="mailFilled" size={24} color={Colors.primary} />
                 }
                 textColor={Colors.primaryDark}
                 keyboardType="number-pad"
                 maxLength={10}
-                value={form.email}
-                onChangeText={(text) => {
-                  const cleaned = text.replace(/[^0-9]/g, "");
-                  updateForm("email", cleaned);
-                }}
-              />
-            </Animated.View>
-
-            {/* Password Input */}
-            <Animated.View style={animatedStyle(passwordOpacity)}>
-              <Input
-                label="Password"
-                placeholder="Enter your password"
-                value={form.password}
-                onChangeText={(text) => updateForm("password", text)}
-                textColor={Colors.primaryDark}
-                secureTextEntry={secure}
-                rightIcon={
-                  <TouchableOpacity onPress={() => setSecure(!secure)}>
-                    <Icon
-                      name={secure ? "eyeFilled" : "eyelock"}
-                      size={20}
-                      color={Colors.primary}
-                    />
-                  </TouchableOpacity>
+                value={form.phonenumber}
+                onChangeText={(t) =>
+                  updateForm("phonenumber", t.replace(/[^0-9]/g, ""))
                 }
               />
+
+              {/* Password */}
+              <Animated.View style={fadeSlide(passOpacity)}>
+                <Input
+                  label="Password"
+                  placeholder="Enter your password"
+                  value={form.password}
+                  onChangeText={(t) => updateForm("password", t)}
+                  textColor={Colors.primaryDark}
+                  secureTextEntry={secure}
+                  rightIcon={
+                    <TouchableOpacity onPress={() => setSecure(!secure)}>
+                      <Icon
+                        name={secure ? "eyeFilled" : "eyelock"}
+                        size={24}
+                        color={Colors.primary}
+                      />
+                    </TouchableOpacity>
+                  }
+                />
+              </Animated.View>
             </Animated.View>
 
-            {/* Login Button */}
-            <Animated.View style={animatedStyle(buttonOpacity)}>
-              <TouchableOpacity
-                onPress={handleLogin}
-                style={[
-                  {
-                    backgroundColor: loading
-                      ? Colors.primaryLight
-                      : Colors.primary,
-                    paddingVertical: 12,
-                    borderRadius: 8,
-                    alignItems: "center",
-                    marginTop: 12,
-                  },
-                ]}
-                disabled={loading}
-              >
-                <StyledText color={Colors.CloudDrift} variant="h6">
-                  {loading ? "Logging in..." : "Login"}
+            {/* Forget Password */}
+            <Animated.View
+              style={[styles.fogetPassword, fadeSlide(forgetOpacity)]}
+            >
+              <TouchableOpacity>
+                <StyledText
+                  variant="h6"
+                  fontFamily="Mono_Regular"
+                  color={Colors.primaryScale[950]}
+                >
+                  Forget Password ?
                 </StyledText>
               </TouchableOpacity>
             </Animated.View>
 
-            {/* Error Message */}
+            {/* Login Button */}
+            <Animated.View style={fadeSlide(btnOpacity)}>
+              <Button
+                title="Login"
+                onPress={handleLogin}
+                gradientColors={Gradients.secondary}
+                loadingGradientColors={Gradients.secondary}
+                loadingIndicatorColor={Colors.CloudDrift}
+                textStyle={{ fontSize: 24 }}
+              />
+            </Animated.View>
+
+            {/* Signup */}
+            <Animated.View style={[styles.signUp, fadeSlide(signOpacity)]}>
+              <StyledText
+                variant="h6"
+                fontFamily="Inter_Medium"
+                color={Colors.neutralDark}
+              >
+                Don’t have a trading account ?
+              </StyledText>
+
+              <TouchableOpacity onPressIn={handleSignUP}>
+                <StyledText
+                  variant="h5"
+                  fontFamily="Inter_Medium"
+                  color={Colors.primaryScale[950]}
+                  fontWeight={600}
+                >
+                  Sign Up
+                </StyledText>
+              </TouchableOpacity>
+            </Animated.View>
+
             {error && (
               <Text style={{ color: "red", marginTop: 8 }}>{error}</Text>
             )}

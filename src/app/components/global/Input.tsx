@@ -58,7 +58,7 @@ const inputStyles = createStyleSheet(({ colors, fontSize, fonts, device }) => ({
   bg: {
     flex: 1,
     fontFamily: fonts.Mono_Regular,
-    fontSize: fontSize.xs,
+    fontSize: fontSize.sm,
   },
   label: {
     marginBottom: 10,
@@ -71,7 +71,7 @@ const inputStyles = createStyleSheet(({ colors, fontSize, fonts, device }) => ({
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "center",
-    height: device.hp(5),
+    height: device.hp(6),
     borderColor: isFocused ? colors.primaryDark : colors.secondaryLight,
     borderWidth: 1,
     borderRadius: 10,

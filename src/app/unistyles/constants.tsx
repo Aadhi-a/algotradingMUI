@@ -50,15 +50,15 @@ export const Colors = {
   backgroundDark: primary[950],
 
   success: "#4caf50",
-  successLight: "#81c784",
+  successLight: "#e3f5e3",
   successDark: "#388e3c",
 
   warning: "#ffb300",
-  warningLight: "#ffcc80",
+  warningLight: "#fff1d4",
   warningDark: "#f57c00",
 
   error: "#e53935",
-  errorLight: "#ef9a9a",
+  errorLight: "#ffe2e7",
   errorDark: "#c62828",
 
   PureCanvas: "#ffffff",
@@ -118,7 +118,7 @@ export const Gradients = {
   primary: [primary[600], Colors.CloudDrift],
   primaryDark: ["#364f47", "#141f1c"],
   primaryDiagonal: ["#527a6c", "#93b5a7", "#ffffff"],
-  secondary: [primary[400], primary[600]],
+  secondary: [primary[700], primary[400]],
 };
 
 // Shadows (responsive optional, mainly elevation & offset)

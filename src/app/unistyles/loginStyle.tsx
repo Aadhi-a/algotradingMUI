@@ -8,6 +8,13 @@ export const loginStyle = createStyleSheet(
     container: {
       padding: spacing.xxl,
     },
+    inputCont: {
+      paddingTop: spacing.xxl,
+    },
+    fogetPassword: {
+      alignSelf: "flex-end",
+      paddingBottom: spacing.xxl,
+    },
     txtContent: {
       justifyContent: "space-between",
       padding: spacing.xxl,
@@ -18,6 +25,13 @@ export const loginStyle = createStyleSheet(
       fontSize: 26,
       color: "red",
       marginBottom: 20,
+    },
+    signUp: {
+      alignItems: "center",
+      flexDirection: "row",
+      alignSelf: "center",
+      paddingBottom: spacing.xxl,
+      gap: 10,
     },
   })
 );
