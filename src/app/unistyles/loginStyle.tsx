@@ -6,6 +6,7 @@ export const loginStyle = createStyleSheet(
       flex: 1,
     },
     container: {
+      marginTop: 10,
       padding: spacing.xxl,
     },
     inputCont: {
@@ -27,11 +28,15 @@ export const loginStyle = createStyleSheet(
       marginBottom: 20,
     },
     signUp: {
-      alignItems: "center",
       flexDirection: "row",
       alignSelf: "center",
       paddingBottom: spacing.xxl,
       gap: 10,
+    },
+    versionContainer: {
+      position: "relative",
+      left: 0,
+      bottom: 0,
     },
   })
 );

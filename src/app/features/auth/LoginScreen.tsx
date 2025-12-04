@@ -23,6 +23,7 @@ import Button from "@components/global/Button";
 import { setStorage } from "@utils/mmkvStrorage";
 import Toast from "react-native-toast-message";
 import { navigate } from "@utils/NavigationUtills";
+import VersionInformation from "@components/pages/VersionInformation";
 
 const LoginScreen: FC = () => {
   const { styles } = useStyles(loginStyle);
@@ -230,7 +231,7 @@ const LoginScreen: FC = () => {
             >
               <TouchableOpacity>
                 <StyledText
-                  variant="h6"
+                  variant="h7"
                   fontFamily="Mono_Regular"
                   color={Colors.primaryScale[950]}
                 >
@@ -263,7 +264,7 @@ const LoginScreen: FC = () => {
 
               <TouchableOpacity onPressIn={handleSignUP}>
                 <StyledText
-                  variant="h5"
+                  variant="h6"
                   fontFamily="Inter_Medium"
                   color={Colors.primaryScale[950]}
                   fontWeight={600}
@@ -278,6 +279,9 @@ const LoginScreen: FC = () => {
             )}
           </View>
         </Animated.View>
+        <View style={styles.versionContainer}>
+          <VersionInformation />
+        </View>
       </LinearGradient>
     </Animated.View>
   );

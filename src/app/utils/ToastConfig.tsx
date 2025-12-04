@@ -132,7 +132,7 @@ export const toastConfig = {
         }}
       >
         {/* <Icon name="arrowLeft" size={30} color="red" /> */}
-        <StyledText variant="h6" fontFamily="Mono_Regular">
+        <StyledText variant="h7" fontFamily="Inter_Bold">
           {text1}
         </StyledText>
       </View>

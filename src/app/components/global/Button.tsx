@@ -10,6 +10,7 @@ import {
 } from "react-native";
 import LinearGradient from "react-native-linear-gradient";
 import { createStyleSheet, useStyles } from "react-native-unistyles";
+import StyledText from "./StylesText";
 
 interface GradientButtonProps {
   title: string;
@@ -71,7 +72,7 @@ const Button: React.FC<GradientButtonProps> = ({
 const buttonStyles = createStyleSheet(
   ({ colors, fontSize, fonts, spacing }) => ({
     button: {
-      height: 50,
+      height: 45,
       borderRadius: 20,
       alignItems: "center",
       justifyContent: "center",
@@ -81,8 +82,8 @@ const buttonStyles = createStyleSheet(
       color: colors.CloudDrift,
       fontFamily: fonts.Inter_ExtraBold,
       letterSpacing: 1,
-      fontSize: fontSize.xl,
-      fontWeight: 700,
+      fontSize: fontSize.sm,
+      fontWeight: 500,
     },
   })
 );
