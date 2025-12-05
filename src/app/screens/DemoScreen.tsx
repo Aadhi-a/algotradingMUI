@@ -1,6 +1,8 @@
 import { View, Text } from "react-native";
 import React, { FC, useEffect, useState } from "react";
 import { getStorage } from "@utils/mmkvStrorage";
+import StickyHeader from "@components/ParallaxHeader";
+import { SafeAreaView } from "react-native-safe-area-context";
 
 const DemoScreen: FC = () => {
   const [menus, setMenus] = useState<any[]>([]);
@@ -30,8 +32,9 @@ const DemoScreen: FC = () => {
   }, []);
 
   return (
-    <View style={{ padding: 20 }}>
-      <Text>DemoScreen</Text>
+    <View style={{ flex: 1 }}>
+      <StickyHeader />
+      {/* <Text>DemoScreen</Text>
 
       {menus.length === 0 ? (
         <Text>No menu data</Text>
@@ -41,7 +44,7 @@ const DemoScreen: FC = () => {
             {JSON.stringify(item)}
           </Text>
         ))
-      )}
+      )} */}
     </View>
   );
 };

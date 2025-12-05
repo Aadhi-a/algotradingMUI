@@ -1,26 +1,25 @@
-import Icon from "@components/global/Icon";
 import React from "react";
 import {
   View,
   Text,
   StyleSheet,
   ScrollView,
-  Image,
   TouchableOpacity,
 } from "react-native";
 import Animated, {
   useSharedValue,
-  useAnimatedScrollHandler,
   useAnimatedStyle,
   interpolate,
   Extrapolate,
+  useAnimatedScrollHandler,
   withSpring,
 } from "react-native-reanimated";
+import Icon from "./global/Icon";
 
-const HEADER_MAX = 250;
+const HEADER_MAX = 150;
 const HEADER_MIN = 70;
 
-export default function StretchyHeader() {
+export default function ScaleRotateHeader() {
   const scrollY = useSharedValue(0);
 
   const onScroll = useAnimatedScrollHandler({
@@ -29,85 +28,79 @@ export default function StretchyHeader() {
     },
   });
 
-  // Stretchy Header Style
-  const headerStyle = useAnimatedStyle(() => {
-    const height =
-      scrollY.value < 0
-        ? HEADER_MAX - scrollY.value // stretch downward
-        : interpolate(
-            scrollY.value,
-            [0, HEADER_MAX - HEADER_MIN],
-            [HEADER_MAX, HEADER_MIN],
-            Extrapolate.CLAMP
-          );
+  // Header height shrink
+  const headerStyle = useAnimatedStyle(() => ({
+    height: interpolate(
+      scrollY.value,
+      [0, HEADER_MAX - HEADER_MIN],
+      [HEADER_MAX, HEADER_MIN],
+      Extrapolate.CLAMP
+    ),
+  }));
 
-    return {
-      height,
-    };
-  });
-
-  // Title scale
+  // Title scale + rotation
   const titleStyle = useAnimatedStyle(() => ({
     transform: [
       {
         scale: interpolate(
           scrollY.value,
-          [-100, 0, 150],
-          [1.3, 1, 0.8],
+          [0, 100],
+          [1, 0.8],
           Extrapolate.CLAMP
         ),
       },
+      {
+        rotate: `${interpolate(
+          scrollY.value,
+          [0, 100],
+          [0, 10],
+          Extrapolate.CLAMP
+        )}deg`,
+      },
     ],
-    opacity: interpolate(scrollY.value, [0, 150], [1, 0.8], Extrapolate.CLAMP),
   }));
 
-  // Icon fade + scale
+  // Icon scale + rotate (opposite)
   const iconStyle = useAnimatedStyle(() => ({
     transform: [
       {
         scale: interpolate(
           scrollY.value,
-          [-100, 0, 150],
-          [1.5, 1, 0.9],
+          [0, 100],
+          [1, 1.3],
           Extrapolate.CLAMP
         ),
       },
+      {
+        rotate: `${interpolate(
+          scrollY.value,
+          [0, 100],
+          [0, -15],
+          Extrapolate.CLAMP
+        )}deg`,
+      },
     ],
-    opacity: interpolate(scrollY.value, [0, 150], [1, 0.7], Extrapolate.CLAMP),
   }));
 
   return (
     <View style={{ flex: 1 }}>
       {/* HEADER */}
       <Animated.View style={[styles.header, headerStyle]}>
-        <Image
-          source={{
-            uri: "https://images.unsplash.com/photo-1503264116251-35a269479413",
-          }}
-          style={styles.bgImage}
-          resizeMode="cover"
-        />
+        <Animated.Text style={[styles.title, titleStyle]}>
+          Dashboard
+        </Animated.Text>
 
-        {/* Overlay for text */}
-        <View style={styles.overlay} />
-
-        <View style={styles.headerContent}>
-          <Animated.Text style={[styles.title, titleStyle]}>
-            Dashboard
-          </Animated.Text>
-          <Animated.View style={[iconStyle]}>
-            <TouchableOpacity>
-              <Icon name="chatsFilled" size={28} color="#fff" />
-            </TouchableOpacity>
-          </Animated.View>
-        </View>
+        <Animated.View style={[iconStyle]}>
+          <TouchableOpacity>
+            <Icon name="chatsFilled" size={28} color="#fff" />
+          </TouchableOpacity>
+        </Animated.View>
       </Animated.View>
 
       {/* CONTENT */}
       <Animated.ScrollView
         onScroll={onScroll}
         scrollEventThrottle={16}
-        bounces={true} // enables pull down stretchy effect
         contentContainerStyle={{ paddingTop: HEADER_MAX }}
       >
         {Array.from({ length: 25 }).map((_, i) => (
@@ -126,25 +119,13 @@ const styles = StyleSheet.create({
     top: 0,
     left: 0,
     right: 0,
-    overflow: "hidden",
-    zIndex: 10,
-  },
-  bgImage: {
-    ...StyleSheet.absoluteFillObject,
-    width: "100%",
-    height: "100%",
-  },
-  overlay: {
-    ...StyleSheet.absoluteFillObject,
-    backgroundColor: "rgba(202, 16, 16, 0.25)",
-  },
-  headerContent: {
-    flex: 1,
+    backgroundColor: "#4A90E2",
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "flex-end",
     paddingHorizontal: 20,
     paddingBottom: 15,
+    zIndex: 100,
   },
   title: {
     color: "#fff",
