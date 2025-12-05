@@ -14,7 +14,9 @@ const initialState: AuthState = {
   error: null,
 };
 
-// Async thunk
+// -------------------------------------------------------------
+//  LOGIN
+// -------------------------------------------------------------
 export const loginUser = createAsyncThunk(
   "auth/login",
   async (payload: { phonenumber: string; password: string }, thunkAPI) => {
@@ -29,6 +31,34 @@ export const loginUser = createAsyncThunk(
   }
 );
 
+// -------------------------------------------------------------
+//  SIGNUP (NEW)
+// -------------------------------------------------------------
+export const registerUser = createAsyncThunk(
+  "auth/register",
+  async (
+    payload: {
+      name: string;
+      email_id: string;
+      phonenumber: string;
+      password: string;
+      confirm_password: string;
+    },
+    thunkAPI
+  ) => {
+    try {
+      const response = await api.post("/mainuser/signup", payload);
+      return response.data;
+    } catch (error: any) {
+      const message =
+        error.response?.data?.message || error.message || "Signup failed";
+      return thunkAPI.rejectWithValue(message);
+    }
+  }
+);
+
+// -------------------------------------------------------------
+
 const authSlice = createSlice({
   name: "auth",
   initialState,
@@ -40,19 +70,39 @@ const authSlice = createSlice({
   },
   extraReducers: (builder) => {
     builder
+      // -------------------
+      // LOGIN
+      // -------------------
       .addCase(loginUser.pending, (state) => {
         state.loading = true;
         state.error = null;
       })
       .addCase(loginUser.fulfilled, (state, action) => {
         state.loading = false;
-        state.user = action.payload;
+        state.user = action.payload; // save user
       })
       .addCase(loginUser.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload as string;
+      })
+
+      // -------------------
+      // SIGNUP
+      // -------------------
+      .addCase(registerUser.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(registerUser.fulfilled, (state, action) => {
+        state.loading = false;
+        state.user = action.payload; // save user from signup API
+      })
+      .addCase(registerUser.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload as string;
       });
   },
 });
 
-export default authSlice.reducer; // ✅ must export .reducer, not the slice itself
+export const { logout } = authSlice.actions;
+export default authSlice.reducer;

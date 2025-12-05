@@ -1,3 +1,5 @@
+// ---------------- LOGIN SCREEN -------------------
+
 import { View, Text, TouchableOpacity, Alert } from "react-native";
 import React, { FC, useState, useEffect } from "react";
 import LinearGradient from "react-native-linear-gradient";
@@ -24,18 +26,26 @@ import { setStorage } from "@utils/mmkvStrorage";
 import Toast from "react-native-toast-message";
 import { navigate } from "@utils/NavigationUtills";
 import VersionInformation from "@components/pages/VersionInformation";
+import { useNavigation, useRoute } from "@react-navigation/native";
 
 const LoginScreen: FC = () => {
   const { styles } = useStyles(loginStyle);
   const dispatch = useDispatch<AppDispatch>();
   const { loading, error } = useSelector((state: RootState) => state.auth);
 
-  const [form, setForm] = useState({ phonenumber: "", password: "" });
   const [secure, setSecure] = useState(true);
 
-  // -------------------------------------------
-  // 🔹 Keyboard Animation
-  // -------------------------------------------
+  // ------------------ ROUTE PARAM ------------------
+  const route = useRoute<any>();
+  const passedPhone = route.params?.phone ?? ""; // param from Signup
+
+  // ------------------ FORM -------------------------
+  const [form, setForm] = useState({
+    phonenumber: "", // use same key everywhere
+    password: "",
+  });
+
+  // ------------------ KEYBOARD ANIMATION ----------
   const keyboard = useAnimatedKeyboard();
   const animatedKeyboardStyle = useAnimatedStyle(() => {
     const translate = interpolate(
@@ -56,9 +66,15 @@ const LoginScreen: FC = () => {
     };
   });
 
-  // -------------------------------------------
-  // 🔹 Fade + Slide Animation Function
-  // -------------------------------------------
+  // ------------------ SHARED VALUES ----------------
+  const bgOpacity = useSharedValue(0);
+  const titleOpacity = useSharedValue(0);
+  const phoneOpacity = useSharedValue(0);
+  const passOpacity = useSharedValue(0);
+  const forgetOpacity = useSharedValue(0);
+  const btnOpacity = useSharedValue(0);
+  const signOpacity = useSharedValue(0);
+
   const fadeSlide = (sv: Animated.SharedValue<number>) =>
     useAnimatedStyle(() => ({
       opacity: sv.value,
@@ -72,28 +88,19 @@ const LoginScreen: FC = () => {
       ],
     }));
 
-  // -------------------------------------------
-  // 🔹 Shared Animation Values
-  // -------------------------------------------
-  const bgOpacity = useSharedValue(0);
-  const titleOpacity = useSharedValue(0);
-  const phoneOpacity = useSharedValue(0);
-  const passOpacity = useSharedValue(0);
-  const forgetOpacity = useSharedValue(0);
-  const btnOpacity = useSharedValue(0);
-  const signOpacity = useSharedValue(0);
-
   const bgStyle = useAnimatedStyle(() => ({
-    opacity: withTiming(bgOpacity.value, {
-      duration: 800,
-      easing: Easing.out(Easing.cubic),
-    }),
+    opacity: withTiming(bgOpacity.value, { duration: 800 }),
   }));
 
-  // -------------------------------------------
-  // 🔹 One-by-One Animation Trigger
-  // -------------------------------------------
+  // ------------------ PARAM AUTO FILL FIXED --------
   useEffect(() => {
+    if (passedPhone) {
+      setForm((prev) => ({
+        ...prev,
+        phonenumber: passedPhone, // ✅ FIXED
+      }));
+    }
+
     bgOpacity.value = 1;
 
     setTimeout(() => (titleOpacity.value = withTiming(1)), 100);
@@ -102,15 +109,14 @@ const LoginScreen: FC = () => {
     setTimeout(() => (forgetOpacity.value = withTiming(1)), 550);
     setTimeout(() => (btnOpacity.value = withTiming(1)), 700);
     setTimeout(() => (signOpacity.value = withTiming(1)), 850);
-  }, []);
+  }, [passedPhone]);
 
-  // -------------------------------------------
-  // 🔹 Form Handlers
-  // -------------------------------------------
+  // ------------------ UPDATE FORM ------------------
   const updateForm = (key: keyof typeof form, value: string) => {
     setForm((prev) => ({ ...prev, [key]: value }));
   };
 
+  // ------------------ LOGIN FUNCTION ----------------
   const handleLogin = async () => {
     if (!form.phonenumber || !form.password) {
       Toast.show({
@@ -122,8 +128,6 @@ const LoginScreen: FC = () => {
     }
 
     try {
-      await new Promise((resolve: any) => setTimeout(resolve, 1000));
-
       const user = await dispatch(
         loginUser({
           phonenumber: form.phonenumber,
@@ -143,13 +147,8 @@ const LoginScreen: FC = () => {
     }
   };
 
-  const handleSignUP = async () => {
-    navigate("Signup");
-  };
+  const handleSignUP = () => navigate("Signup");
 
-  // -------------------------------------------
-  // 🔹 UI Render
-  // -------------------------------------------
   return (
     <Animated.View style={[{ flex: 1 }, bgStyle]}>
       <LinearGradient
@@ -169,7 +168,6 @@ const LoginScreen: FC = () => {
                   variant="h3"
                   fontFamily="Mono_Regular"
                   color={Colors.textMuted}
-                  style={Shadows.textShadow}
                 >
                   Let’s Trade Smarter!!
                 </StyledText>
@@ -178,24 +176,21 @@ const LoginScreen: FC = () => {
                   variant="h5"
                   fontFamily="Inter_ExtraBold"
                   color={Colors.textMuted}
-                  style={Shadows.textShadow}
                 >
                   Login to your trading account
                 </StyledText>
               </View>
             </Animated.View>
 
-            {/* Inputs */}
+            {/* Input Fields */}
             <Animated.View style={[styles.inputCont, fadeSlide(phoneOpacity)]}>
-              {/* Mobile Number */}
               <Input
                 label="Mobile Number"
                 placeholder="Enter your mobile number"
+                keyboardType="number-pad"
                 leftIcon={
                   <Icon name="mailFilled" size={24} color={Colors.primary} />
                 }
-                textColor={Colors.primaryDark}
-                keyboardType="number-pad"
                 maxLength={10}
                 value={form.phonenumber}
                 onChangeText={(t) =>
@@ -203,15 +198,13 @@ const LoginScreen: FC = () => {
                 }
               />
 
-              {/* Password */}
               <Animated.View style={fadeSlide(passOpacity)}>
                 <Input
                   label="Password"
-                  placeholder="Enter your password"
+                  placeholder="Enter password"
+                  secureTextEntry={secure}
                   value={form.password}
                   onChangeText={(t) => updateForm("password", t)}
-                  textColor={Colors.primaryDark}
-                  secureTextEntry={secure}
                   rightIcon={
                     <TouchableOpacity onPress={() => setSecure(!secure)}>
                       <Icon
@@ -240,32 +233,23 @@ const LoginScreen: FC = () => {
               </TouchableOpacity>
             </Animated.View>
 
-            {/* Login Button */}
+            {/* Button */}
             <Animated.View style={fadeSlide(btnOpacity)}>
               <Button
                 title="Login"
                 onPress={handleLogin}
                 gradientColors={Gradients.secondary}
-                loadingGradientColors={Gradients.secondary}
-                loadingIndicatorColor={Colors.CloudDrift}
-                textStyle={{ fontSize: 24 }}
               />
             </Animated.View>
 
-            {/* Signup */}
             <Animated.View style={[styles.signUp, fadeSlide(signOpacity)]}>
-              <StyledText
-                variant="h6"
-                fontFamily="Inter_Medium"
-                color={Colors.neutralDark}
-              >
+              <StyledText variant="h6" color={Colors.neutralDark}>
                 Don’t have a trading account ?
               </StyledText>
 
-              <TouchableOpacity onPressIn={handleSignUP}>
+              <TouchableOpacity onPress={handleSignUP}>
                 <StyledText
                   variant="h6"
-                  fontFamily="Inter_Medium"
                   color={Colors.primaryScale[950]}
                   fontWeight={600}
                 >
@@ -274,11 +258,10 @@ const LoginScreen: FC = () => {
               </TouchableOpacity>
             </Animated.View>
 
-            {error && (
-              <Text style={{ color: "red", marginTop: 8 }}>{error}</Text>
-            )}
+            {error && <Text style={{ color: "red" }}>{error}</Text>}
           </View>
         </Animated.View>
+
         <View style={styles.versionContainer}>
           <VersionInformation />
         </View>

@@ -21,9 +21,16 @@ import Toast from "react-native-toast-message";
 import { navigate } from "@utils/NavigationUtills";
 import VersionInformation from "@components/pages/VersionInformation";
 import { SafeAreaView } from "react-native-safe-area-context";
+import { useDispatch, useSelector } from "react-redux";
+import { AppDispatch, RootState } from "@features/toolkit/store/store";
+import { registerUser } from "@features/toolkit/slice/authSlice";
 
 const SignupScreen: FC = () => {
   const { styles } = useStyles(loginStyle);
+  const [securePass, setSecurePass] = useState(true);
+  const [secureConfirm, setSecureConfirm] = useState(true);
+  const dispatch = useDispatch<AppDispatch>();
+  const { loading, error } = useSelector((state: RootState) => state.auth);
 
   const [form, setForm] = useState({
     name: "",
@@ -32,9 +39,6 @@ const SignupScreen: FC = () => {
     password: "",
     confirmPassword: "",
   });
-
-  const [securePass, setSecurePass] = useState(true);
-  const [secureConfirm, setSecureConfirm] = useState(true);
 
   // -------------------
   // Keyboard Animation
@@ -139,17 +143,10 @@ const SignupScreen: FC = () => {
   };
 
   const handleRegister = () => {
-    if (
-      !form.name ||
-      !form.email ||
-      !form.phoneNumber ||
-      !form.password ||
-      !form.confirmPassword
-    ) {
+    if (!form.password || !form.confirmPassword) {
       Toast.show({
         type: "errorToast",
-        text1: "Please fill all fields",
-        position: "bottom",
+        text1: "Please enter password & confirm password",
       });
       return;
     }
@@ -158,16 +155,35 @@ const SignupScreen: FC = () => {
       Toast.show({
         type: "errorToast",
         text1: "Passwords do not match",
-        position: "bottom",
       });
       return;
     }
 
-    Toast.show({
-      type: "successToast",
-      text1: "Account created successfully!",
-      position: "top",
-    });
+    const payload = {
+      name: form.name,
+      email_id: form.email,
+      phonenumber: form.phoneNumber,
+      password: form.password,
+      confirm_password: form.confirmPassword,
+    };
+
+    dispatch(registerUser(payload))
+      .unwrap()
+      .then((res) => {
+        Toast.show({
+          type: "successToast",
+          text1: "Signup successful",
+        });
+        navigate("Login", {
+          phone: form.phoneNumber,
+        });
+      })
+      .catch((err) => {
+        Toast.show({
+          type: "errorToast",
+          text1: err,
+        });
+      });
   };
 
   const handleAccount = async () => {
@@ -225,6 +241,7 @@ const SignupScreen: FC = () => {
                     label="Email"
                     placeholder="Enter your email"
                     keyboardType="email-address"
+                    autoCapitalize="none"
                     leftIcon={
                       <Icon
                         name="mailFilled"
