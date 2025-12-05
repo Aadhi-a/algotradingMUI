@@ -9,7 +9,7 @@ import Animated, {
 } from "react-native-reanimated";
 import { useStyles } from "react-native-unistyles";
 import { resetAndNavigate } from "@utils/NavigationUtills";
-import { storage } from "@utils/mmkvStrorage";
+import { getStorage, storage } from "@utils/mmkvStrorage";
 import StyledText from "@components/global/StylesText";
 import { splashStyle } from "@unistyles/splashStyle";
 
@@ -36,10 +36,19 @@ const SplashScreen: FC = () => {
     );
 
     const checkLoginStatus = setTimeout(() => {
-      const token = storage.getString("Request_Token");
+      const storedUser = getStorage("User");
+      let user = null;
 
-      if (token) {
-        resetAndNavigate("UserBottomTabs");
+      if (storedUser) {
+        try {
+          user = JSON.parse(storedUser);
+          console.log("parseUser====>", user);
+        } catch {
+          user = null;
+        }
+      }
+      if (user && user.isMainUser === true) {
+        resetAndNavigate("DemoScreen");
       } else {
         resetAndNavigate("Login");
       }

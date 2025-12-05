@@ -135,8 +135,10 @@ const LoginScreen: FC = () => {
         })
       ).unwrap();
 
-      setStorage("User", JSON.stringify(user));
-
+      if (user) {
+        setStorage("User", JSON.stringify(user));
+        navigate("DemoScreen");
+      }
       Toast.show({
         type: "successToast",
         text1: "Logged in successfully!",

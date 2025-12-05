@@ -6,6 +6,7 @@ import { navigationRef } from "@utils/NavigationUtills";
 import SplashScreen from "@features/SplashScreen";
 import LoginScreen from "@features/auth/LoginScreen";
 import SignupScreen from "@features/auth/SignupScreen";
+import DemoScreen from "@screens/DemoScreen";
 
 const Stack = createStackNavigator();
 
@@ -23,6 +24,13 @@ export default function Navigation() {
         <Stack.Screen
           name="Signup"
           component={SignupScreen}
+          options={{
+            animation: "scale_from_center",
+          }}
+        />
+        <Stack.Screen
+          name="DemoScreen"
+          component={DemoScreen}
           options={{
             animation: "scale_from_center",
           }}
